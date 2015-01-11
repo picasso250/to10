@@ -7,8 +7,8 @@ $(function () {
 	};
 	var pileCount = 5;
 	var forEach = function (callback) {
-		for (var i = pileCount - 1; i >= 0; i++) {
-			for (var j = pileCount - 1; j >= 0; j++) {
+		for (var i = 0; i < pileCount; i++) {
+			for (var j = 0; j < pileCount; j++) {
 				callback(i, j);
 			}
 		}

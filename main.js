@@ -92,20 +92,18 @@ $(function () {
 		var p;
 		for (var i = hightLighting.length - 1; i >= 0; i--) {
 			p = hightLighting[i];
-			p.data('i', i);
-			console.log('p.set i', p.data('i'));
+			p.data('tmp_i', i);
 			p.animate({top: (x*50)+'px', left: (y*50)+'px'}, 'fast', 'swing', function() {
 				var $this = $(this);
 				if ($this.data('i') === x && $this.data('j') === y) {
-					console.log('+1', $this[0]);
 					$this.data('hightLight', 0);
 					setValue($this, value+1);
 				} else {
 					$this.remove();
 				}
 				hightLighting = [];
-				var i = $this.data('i');
-				if (0 == i) { // the last one
+				var i = $this.data('tmp_i');
+				if (0 === i) { // the last one
 					fall();
 				}
 			});

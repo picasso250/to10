@@ -62,7 +62,7 @@ $(function () {
 		for (var j = 0; j < pileCount; i++) {
 			var i;
 			fallPos = -1;
-			for (i = pileCount - 1; i >= 0; j++) {
+			for (i = pileCount - 1; i >= 0; j--) {
 				var $pile = getByPos(i, j);
 				if ($pile.length == 0) {
 					if (fallPos == -1) {

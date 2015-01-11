@@ -92,21 +92,22 @@ $(function () {
 		var p;
 		for (var i = hightLighting.length - 1; i >= 0; i--) {
 			p = hightLighting[i];
-			p.data('will_remove', i);
-			console.log('p.set will_remove', p.data('will_remove'));
+			p.data('i', i);
+			console.log('p.set i', p.data('i'));
 			p.animate({top: (x*50)+'px', left: (y*50)+'px'}, 'fast', 'swing', function() {
 				var $this = $(this);
-				var will_remove = $this.data('will_remove');
-				if (will_remove) {
-					console.log('will_remove', $this[0]);
-					$this.remove();
-				} else {
+				if ($this.data('i') === x && $this.data('j') === y) {
 					console.log('+1', $this[0]);
 					$this.data('hightLight', 0);
 					setValue($this, value+1);
-					fall();
+				} else {
+					$this.remove();
 				}
 				hightLighting = [];
+				var i = $this.data('i');
+				if (0 == i) { // the last one
+					fall();
+				}
 			});
 			p.data('hightLight', 0);
 		};

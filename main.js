@@ -18,16 +18,19 @@ $(function () {
 		node.text(value);
 		node.css('background-color', colorMap[value]);
 	};
-	forEach(function (i, j) {
+	var pileSize = 50;
+	var makePile = function (i, j) {
 		var value = Math.floor(Math.random() * 3 + 1);
 		var node = $('<div id="D_'+i+'_'+j+'" class="pile">'+value+'<div>');
 		node.data('i', i);
 		node.data('j', j);
 		node.data('hightLight', 0);
-		var pileSize = 50;
 		node.css('top', (i * pileSize)+'px').css('left', (j * pileSize)+'px');
 		setValue(node, value);
 		P.append(node);
+	}
+	forEach(function (i, j) {
+		makePile(i, j);
 	});
 	var hightLighting = [];
 	var hightLight = function ($pile) {
@@ -44,15 +47,43 @@ $(function () {
 	};
 	var hightLightXY = function (i, j, value) {
 		if (i >= 0 && i < pileCount && j >= 0 && j < pileCount) {
-			var selector = '#D_'+i+'_'+j;
-			var neighber = $(selector);
-			// console.log('hightLightXY', i, j, value, neighber[0]);
+			var neighber = getByPos(i, j);
 			if (!neighber.data('hightLight') && neighber.data('value') == value) {
 				hightLight(neighber);
 			}
 		};
 	};
+	var getByPos = function (i, j) {
+		return $('#D_'+i+'_'+j);
+	}
 	var fall = function  () {
+		// for every col
+		var fallPos;
+		for (var j = 0; j < pileCount; i++) {
+			var i;
+			fallPos = -1;
+			for (i = pileCount - 1; i >= 0; j++) {
+				var $pile = getByPos(i, j);
+				if ($pile.length == 0) {
+					if (fallPos == -1) {
+						fallPos = i;
+					}
+				} else {
+					if (fallPos != -1) {
+						// we fall
+						$pile.animate({top: '+='+((fallPos-i)*pileSize)+'px'}, 'fast');
+						$pile.attr('id', '#D_'+fallPos+'_'+j);
+						$pile.data('i', fallPos);
+						fallPos++;
+					};
+				}
+			}
+			if (fallPos != -1) {
+				for (i = 0; i <= fallPos; i++) {
+					makePile(i, j);
+				};
+			};
+		};
 	};
 	var collapse = function ($pile) {
 		var x = $pile.data('i');
@@ -71,6 +102,7 @@ $(function () {
 					$this.remove();
 				} else {
 					console.log('+1', $this[0]);
+					$this.data('hightLight', 0);
 					setValue($this, value+1);
 					fall();
 				}

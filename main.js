@@ -19,16 +19,20 @@ $(function () {
 		node.css('background-color', colorMap[value]);
 	};
 	var pileSize = 50;
+	var setPileCol = function (node, i) {
+		node.data('i', i);
+		node.css('z-index', i);
+	};
 	var makePile = function (i, j) {
 		var value = Math.floor(Math.random() * 3 + 1);
 		var node = $('<div id="D_'+i+'_'+j+'" class="pile">'+value+'<div>');
-		node.data('i', i);
-		node.data('j', j);
-		node.data('hightLight', 0);
+		setPileCol(node, i, j);
 		node.css('top', (i * pileSize)+'px').css('left', (j * pileSize)+'px');
+		node.data('hightLight', 0);
 		setValue(node, value);
 		P.append(node);
-	}
+		return node;
+	};
 	forEach(function (i, j) {
 		makePile(i, j);
 	});
@@ -59,26 +63,27 @@ $(function () {
 	var fall = function  () {
 		// for every col
 		var fallPos;
-		for (var j = 0; j < pileCount; i++) {
+		for (var j = 0; j < pileCount; j++) {
 			var i;
 			fallPos = -1;
-			for (i = pileCount - 1; i >= 0; j--) {
+			for (i = pileCount - 1; i >= 0; i--) {
 				var $pile = getByPos(i, j);
-				if ($pile.length == 0) {
-					if (fallPos == -1) {
+				var length = $pile.length;
+				if (length === 0) {
+					if (fallPos === -1) {
 						fallPos = i;
 					}
 				} else {
-					if (fallPos != -1) {
+					if (fallPos !== -1) {
 						// we fall
-						$pile.animate({top: '+='+((fallPos-i)*pileSize)+'px'}, 'fast');
+						$pile.animate({top: ((fallPos)*pileSize)+'px'}, 'fast');
+						setPileCol(i);
 						$pile.attr('id', '#D_'+fallPos+'_'+j);
-						$pile.data('i', fallPos);
-						fallPos++;
+						fallPos--;
 					};
 				}
 			}
-			if (fallPos != -1) {
+			if (fallPos !== -1) {
 				for (i = 0; i <= fallPos; i++) {
 					makePile(i, j);
 				};
@@ -95,15 +100,17 @@ $(function () {
 			p.data('tmp_i', i);
 			p.animate({top: (x*50)+'px', left: (y*50)+'px'}, 'fast', 'swing', function() {
 				var $this = $(this);
-				if ($this.data('i') === x && $this.data('j') === y) {
+				var i = $this.data('i');
+				var j = $this.data('j');
+				if (i === x && j === y) {
 					$this.data('hightLight', 0);
 					setValue($this, value+1);
 				} else {
 					$this.remove();
 				}
 				hightLighting = [];
-				var i = $this.data('tmp_i');
-				if (0 === i) { // the last one
+				var tmp_i = $this.data('tmp_i');
+				if (0 === tmp_i) { // the last one
 					fall();
 				}
 			});

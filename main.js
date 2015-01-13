@@ -49,6 +49,23 @@ $(function () {
 		node.attr('id', 'D_'+i+'_'+j);
 	};
 
+	var onClick = function (e) {
+		var $this = $(this);
+		if (!$this.data('hightLight')) {
+			if (hightLighting.length > 0) {
+				for (var i = hightLighting.length - 1; i >= 0; i--) {
+					var p = hightLighting[i];
+					p.animate({top: '+=5px'}, 'fast');
+					p.data('hightLight', 0);
+				};
+			}
+			hightLighting = [];
+			hightLight($this);
+		} else {
+			collapse($this);
+		}
+	};
+
 	var makePile = function (i, j, realRow) {
 		var value = Math.floor(Math.random() * 3 + 1);
 		var node = $('<div id="D_'+i+'_'+j+'" class="pile">'+value+'<div>');
@@ -57,19 +74,19 @@ $(function () {
 		node.data('realRow', realRow);
 		node.data('hightLight', 0);
 		setValue(node, value);
+		node.on('click', onClick);
 		P.append(node);
 		return node;
 	};
 	forEach(function (i, j) {
 		$pile = makePile(i, j, i);
-		console.log(i, j, '=>', $pile.data('value'));
 	});
 
 	var hightLighting = [];
 	var hightLight = function ($pile) {
 		$pile.animate({top: '-=5px'});
 		$pile.data('hightLight', 1);
-		hightLighting.push($pile);
+		hightLighting.push($pile[0]);
 		var x = $pile.data('i');
 		var y = $pile.data('j');
 		var value = $pile.data('value');
@@ -131,45 +148,26 @@ $(function () {
 		var x = $pile.data('i');
 		var y = $pile.data('j');
 		var value = $pile.data('value');
-		var p;
-		for (var i = hightLighting.length - 1; i >= 0; i--) {
-			p = hightLighting[i];
-			p.data('tmp_i', i);
-			p.animate({top: (x*50)+'px', left: (y*50)+'px'}, 'fast', 'swing', function() {
-				var $this = $(this);
-				var i = $this.data('i');
-				var j = $this.data('j');
-				if (i === x && j === y) {
-					$this.data('hightLight', 0);
-					setValue($this, value+1);
+		var endPos = {top: (x*50)+'px', left: (y*50)+'px'};
+		$(hightLighting).animate(endPos, 'fast', 'swing', function() {
+			console.log('animate callback', value);
+			var p;
+			for (var i = hightLighting.length - 1; i >= 0; i--) {
+				p = $(hightLighting[i]);
+				if (i) {
+					p.remove();
 				} else {
-					$this.remove();
-				}
-				hightLighting = [];
-				var tmp_i = $this.data('tmp_i');
-				if (0 === tmp_i) { // the last one
-					prepareFill();
-					fall();
-				}
-			});
-			p.data('hightLight', 0);
-		};
-	};
-	$('.pile').click(function (e) {
-		var $this = $(this);
-		console.log('this.length', $this.length);
-		if (!$this.data('hightLight')) {
-			if (hightLighting.length > 0) {
-				for (var i = hightLighting.length - 1; i >= 0; i--) {
-					var p = hightLighting[i];
-					p.animate({top: '+=5px'}, 'fast');
 					p.data('hightLight', 0);
-				};
-			}
+					setValue(p, value+1);
+				}
+			};
+
 			hightLighting = [];
-			hightLight($this);
-		} else {
-			collapse($this);
-		}
-	});
+
+			console.log('last one, we fall', value);
+			prepareFill();
+			fall();
+
+		});
+	};
 });

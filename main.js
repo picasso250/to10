@@ -59,7 +59,7 @@ $(function () {
 		var $this = $(this);
 		if (!$this.data('hightLight')) {
 			if (highLighting.length > 0) {
-				// if others are highlighting
+				// if others are highlight-ing
 				$(highLighting).data('hightLight', 0);
 				changePos(highLighting, 'top', 5);
 			}
@@ -67,7 +67,9 @@ $(function () {
 			hightLight($this);
 			changePos(highLighting, 'top', -5);
 		} else {
-			collapse($this);
+			if (highLighting.length > 1) {
+				collapse($this);
+			};
 		}
 	};
 
@@ -179,14 +181,14 @@ $(function () {
 		};
 		var endPos = {top: (x*50), left: (y*50)};
 		animate(200, function (leftFrameCount) {
-		highLighting.map(function(e) {
-			['top', 'left'].map(function(attr) {
-				var val = parseInt(e.style[attr]);
-				var distance = (endPos[attr] - val);
-				var step = Math.floor(distance / leftFrameCount);
-				e.style[attr] = (val + step) + 'px';
+			highLighting.map(function(e) {
+				['top', 'left'].map(function(attr) {
+					var val = parseInt(e.style[attr]);
+					var distance = (endPos[attr] - val);
+					var step = Math.floor(distance / leftFrameCount);
+					e.style[attr] = (val + step) + 'px';
+				});
 			});
-		});
 		}, function() {
 			console.log('animate callback', value);
 			var p;

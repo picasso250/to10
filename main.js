@@ -1,11 +1,17 @@
 $(function () {
-	var P = $('#P');
+	var P = $('#P'); // the panel, container of all
+
+	// color of text and background
 	var colorMap = {
 		1: 'red',
 		2: 'yellow',
 		3: 'blue',
 	};
+
+	// game's size
 	var pileCount = 5;
+
+	// for every pile
 	var forEach = function (callback) {
 		for (var i = 0; i < pileCount; i++) {
 			for (var j = 0; j < pileCount; j++) {
@@ -13,29 +19,41 @@ $(function () {
 			}
 		}
 	};
+
+	// set the number showed on the pile
 	var setValue = function (node, value) {
 		node.data('value', value);
 		node.text(value);
 		node.css('background-color', colorMap[value]);
 	};
+
+	// px of size of pile
 	var pileSize = 50;
-	var setPileCol = function (node, i) {
+
+	// when pile fall, row No. change
+	var setPilePos = function (node, i, j) {
 		node.data('i', i);
+		node.data('j', j);
 		node.css('z-index', i);
+		node.attr('id', 'D_'+i+'_'+j);
 	};
-	var makePile = function (i, j) {
+
+	var makePile = function (i, j, realRow) {
 		var value = Math.floor(Math.random() * 3 + 1);
 		var node = $('<div id="D_'+i+'_'+j+'" class="pile">'+value+'<div>');
-		setPileCol(node, i, j);
-		node.css('top', (i * pileSize)+'px').css('left', (j * pileSize)+'px');
+		setPilePos(node, i, j);
+		node.css('top', (realRow * pileSize)+'px').css('left', (j * pileSize)+'px');
+		node.data('realRow', realRow);
 		node.data('hightLight', 0);
 		setValue(node, value);
 		P.append(node);
 		return node;
 	};
 	forEach(function (i, j) {
-		makePile(i, j);
+		$pile = makePile(i, j, i);
+		console.log(i, j, '=>', $pile.data('value'));
 	});
+
 	var hightLighting = [];
 	var hightLight = function ($pile) {
 		$pile.animate({top: '-=5px'});
@@ -52,42 +70,54 @@ $(function () {
 	var hightLightXY = function (i, j, value) {
 		if (i >= 0 && i < pileCount && j >= 0 && j < pileCount) {
 			var neighber = getByPos(i, j);
-			if (!neighber.data('hightLight') && neighber.data('value') == value) {
+			var isHightLight = neighber.data('hightLight');
+			var neighberValue = neighber.data('value');
+			if (!isHightLight && neighberValue === value) {
 				hightLight(neighber);
 			}
 		};
 	};
 	var getByPos = function (i, j) {
-		return $('#D_'+i+'_'+j);
+		var p = $('#D_'+i+'_'+j);
+		console.log(p);
+		console.log(p.length);
+		console.log(p[0]);
+		console.log(p.html());
+		return p;
 	}
-	var fall = function  () {
+	var prepareFill = function  () {
 		// for every col
 		var fallPos;
 		for (var j = 0; j < pileCount; j++) {
 			var i;
-			fallPos = -1;
+			var r = pileCount - 1; // real i
 			for (i = pileCount - 1; i >= 0; i--) {
 				var $pile = getByPos(i, j);
 				var length = $pile.length;
 				if (length === 0) {
-					if (fallPos === -1) {
-						fallPos = i;
-					}
 				} else {
-					if (fallPos !== -1) {
-						// we fall
-						$pile.animate({top: ((fallPos)*pileSize)+'px'}, 'fast');
-						setPileCol(i);
-						$pile.attr('id', '#D_'+fallPos+'_'+j);
-						fallPos--;
-					};
+					setPilePos($pile, r, j);
+					r--;
 				}
 			}
-			if (fallPos !== -1) {
-				for (i = 0; i <= fallPos; i++) {
-					makePile(i, j);
-				};
+			var realRow = -1;
+			for (; r >= 0; r--) {
+				makePile(r, j, realRow);
+				realRow--;
 			};
+		};
+	};
+	var fall = function  () {
+		// for every col
+		for (var j = 0; j < pileCount; j++) {
+			var i;
+			for (i = pileCount - 1; i >= 0; i--) {
+				var $pile = getByPos(i, j);
+				if ($pile.data('realRow') !== i) {
+					// we fall
+					$pile.animate({top: ((i)*pileSize)+'px'}, 'slow');
+				};
+			}
 		};
 	};
 	var collapse = function ($pile) {
@@ -111,6 +141,7 @@ $(function () {
 				hightLighting = [];
 				var tmp_i = $this.data('tmp_i');
 				if (0 === tmp_i) { // the last one
+					prepareFill();
 					fall();
 				}
 			});
@@ -119,8 +150,8 @@ $(function () {
 	};
 	$('.pile').click(function (e) {
 		var $this = $(this);
+		console.log('this.length', $this.length);
 		if (!$this.data('hightLight')) {
-			console.log('length', hightLighting.length);
 			if (hightLighting.length > 0) {
 				for (var i = hightLighting.length - 1; i >= 0; i--) {
 					var p = hightLighting[i];

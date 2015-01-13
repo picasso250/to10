@@ -53,14 +53,12 @@ $(function () {
 		var $this = $(this);
 		if (!$this.data('hightLight')) {
 			if (hightLighting.length > 0) {
-				for (var i = hightLighting.length - 1; i >= 0; i--) {
-					var p = hightLighting[i];
-					p.animate({top: '+=5px'}, 'fast');
-					p.data('hightLight', 0);
-				};
+				// if others are highlighting
+				$(hightLighting).animate({top: '+=5px'}, 'fast').data('hightLight', 0);
 			}
 			hightLighting = [];
 			hightLight($this);
+			$(hightLighting).animate({top: '-=5px'});
 		} else {
 			collapse($this);
 		}
@@ -84,7 +82,6 @@ $(function () {
 
 	var hightLighting = [];
 	var hightLight = function ($pile) {
-		$pile.animate({top: '-=5px'});
 		$pile.data('hightLight', 1);
 		hightLighting.push($pile[0]);
 		var x = $pile.data('i');
@@ -159,6 +156,7 @@ $(function () {
 				} else {
 					p.data('hightLight', 0);
 					setValue(p, value+1);
+					setPilePos(p, x, y);
 				}
 			};
 
@@ -167,7 +165,6 @@ $(function () {
 			console.log('last one, we fall', value);
 			prepareFill();
 			fall();
-
 		});
 	};
 });

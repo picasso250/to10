@@ -6,11 +6,11 @@ $(function () {
 		1: ['rgb(50,245,82)', 'rgb(14, 97, 27)'],
 		2: ['rgb(49, 149, 232)', 'rgb(0, 68, 176)'],
 		3: ['rgb(226, 197, 0)', 'rgb(229, 86, 12)'],
-		4: ['blue', 'red'],
-		5: ['blue', 'red'],
-		6: ['blue', 'red'],
-		7: ['blue', 'red'],
-		8: ['blue', 'red'],
+		4: ['rgb(239, 94, 30)', 'rgb(255, 198, 173)'],
+		5: ['rgb(73, 119, 41)', 'rgb(46, 234, 70)'],
+		6: ['rgb(103, 13, 113)', 'rgb(226, 56, 253)'],
+		7: ['rgb(173, 11, 122)', 'rgb(252, 168, 245)'],
+		8: ['rgb(157, 13, 29)', 'rgb(245, 182, 182)'],
 		9: ['blue', 'red'],
 		11: ['blue', 'red'],
 		12: ['blue', 'red'],
@@ -49,23 +49,35 @@ $(function () {
 		node.attr('id', 'D_'+i+'_'+j);
 	};
 
+	var changePos = function (array, attr, val) {
+		array.map(function (e) {
+			var old = parseInt(e.style[attr]);
+			e.style[attr] = (old + val) + 'px';
+		});
+	};
 	var onClick = function (e) {
 		var $this = $(this);
 		if (!$this.data('hightLight')) {
 			if (hightLighting.length > 0) {
 				// if others are highlighting
-				$(hightLighting).animate({top: '+=5px'}, 'fast').data('hightLight', 0);
+				$(hightLighting).data('hightLight', 0);
+				changePos(hightLighting, 'top', 5);
 			}
 			hightLighting = [];
 			hightLight($this);
-			$(hightLighting).animate({top: '-=5px'});
+			changePos(hightLighting, 'top', -5);
 		} else {
 			collapse($this);
 		}
 	};
 
-	var makePile = function (i, j, realRow) {
-		var value = Math.floor(Math.random() * 3 + 1);
+	var gMaxValue = 0;
+
+	var makePile = function (i, j, realRow, maxValue) {
+		var value = Math.floor(Math.random() * maxValue + 1);
+		if (value > gMaxValue) {
+			gMaxValue = value;
+		};
 		var node = $('<div id="D_'+i+'_'+j+'" class="pile">'+value+'<div>');
 		setPilePos(node, i, j);
 		node.css('top', (realRow * pileSize)+'px').css('left', (j * pileSize)+'px');
@@ -77,7 +89,7 @@ $(function () {
 		return node;
 	};
 	forEach(function (i, j) {
-		$pile = makePile(i, j, i);
+		$pile = makePile(i, j, i, 3);
 	});
 
 	var hightLighting = [];
@@ -123,7 +135,7 @@ $(function () {
 			}
 			var realRow = -1;
 			for (; r >= 0; r--) {
-				makePile(r, j, realRow);
+				makePile(r, j, realRow, gMaxValue);
 				realRow--;
 			};
 		};
@@ -145,6 +157,9 @@ $(function () {
 		var x = $pile.data('i');
 		var y = $pile.data('j');
 		var value = $pile.data('value');
+		if (value + 1 > gMaxValue) {
+			gMaxValue = value + 1;
+		};
 		var endPos = {top: (x*50)+'px', left: (y*50)+'px'};
 		$(hightLighting).animate(endPos, 'fast', 'swing', function() {
 			console.log('animate callback', value);

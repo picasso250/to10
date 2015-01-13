@@ -58,14 +58,14 @@ $(function () {
 	var onClick = function (e) {
 		var $this = $(this);
 		if (!$this.data('hightLight')) {
-			if (hightLighting.length > 0) {
+			if (highLighting.length > 0) {
 				// if others are highlighting
-				$(hightLighting).data('hightLight', 0);
-				changePos(hightLighting, 'top', 5);
+				$(highLighting).data('hightLight', 0);
+				changePos(highLighting, 'top', 5);
 			}
-			hightLighting = [];
+			highLighting = [];
 			hightLight($this);
-			changePos(hightLighting, 'top', -5);
+			changePos(highLighting, 'top', -5);
 		} else {
 			collapse($this);
 		}
@@ -92,10 +92,10 @@ $(function () {
 		$pile = makePile(i, j, i, 3);
 	});
 
-	var hightLighting = [];
+	var highLighting = [];
 	var hightLight = function ($pile) {
 		$pile.data('hightLight', 1);
-		hightLighting.push($pile[0]);
+		highLighting.push($pile[0]);
 		var x = $pile.data('i');
 		var y = $pile.data('j');
 		var value = $pile.data('value');
@@ -153,6 +153,23 @@ $(function () {
 			}
 		};
 	};
+	var animate = function (time, callback, after) {
+		var startTime = Date.now();
+		var endTime = startTime + time;
+		var func = function () {
+			var timeLeft = endTime - Date.now();
+			if (timeLeft < 0) {
+				after();
+				console.log('cancel');
+				return;
+			};
+			var leftFrameCount = Math.floor(timeLeft / (1000/60)); // left frame count
+			callback(leftFrameCount);
+			var id = requestAnimationFrame(func);
+			console.log('every frame', id);
+		};
+		requestAnimationFrame(func);
+	}
 	var collapse = function ($pile) {
 		var x = $pile.data('i');
 		var y = $pile.data('j');
@@ -160,12 +177,21 @@ $(function () {
 		if (value + 1 > gMaxValue) {
 			gMaxValue = value + 1;
 		};
-		var endPos = {top: (x*50)+'px', left: (y*50)+'px'};
-		$(hightLighting).animate(endPos, 'fast', 'swing', function() {
+		var endPos = {top: (x*50), left: (y*50)};
+		animate(200, function (leftFrameCount) {
+		highLighting.map(function(e) {
+			['top', 'left'].map(function(attr) {
+				var val = parseInt(e.style[attr]);
+				var distance = (endPos[attr] - val);
+				var step = Math.floor(distance / leftFrameCount);
+				e.style[attr] = (val + step) + 'px';
+			});
+		});
+		}, function() {
 			console.log('animate callback', value);
 			var p;
-			for (var i = hightLighting.length - 1; i >= 0; i--) {
-				p = $(hightLighting[i]);
+			for (var i = highLighting.length - 1; i >= 0; i--) {
+				p = $(highLighting[i]);
 				if (i) {
 					p.remove();
 				} else {
@@ -175,7 +201,7 @@ $(function () {
 				}
 			};
 
-			hightLighting = [];
+			highLighting = [];
 
 			console.log('last one, we fall', value);
 			prepareFill();

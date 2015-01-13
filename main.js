@@ -180,7 +180,7 @@ $(function () {
 			gMaxValue = value + 1;
 		};
 		var endPos = {top: (x*50), left: (y*50)};
-		animate(200, function (leftFrameCount) {
+		animate(300, function (leftFrameCount) {
 			highLighting.map(function(e) {
 				['top', 'left'].map(function(attr) {
 					var val = parseInt(e.style[attr]);

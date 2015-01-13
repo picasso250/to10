@@ -3,9 +3,19 @@ $(function () {
 
 	// color of text and background
 	var colorMap = {
-		1: 'red',
-		2: 'yellow',
-		3: 'blue',
+		1: ['rgb(50,245,82)', 'rgb(14, 97, 27)'],
+		2: ['rgb(49, 149, 232)', 'rgb(0, 68, 176)'],
+		3: ['rgb(226, 197, 0)', 'rgb(229, 86, 12)'],
+		4: ['blue', 'red'],
+		5: ['blue', 'red'],
+		6: ['blue', 'red'],
+		7: ['blue', 'red'],
+		8: ['blue', 'red'],
+		9: ['blue', 'red'],
+		11: ['blue', 'red'],
+		12: ['blue', 'red'],
+		13: ['blue', 'red'],
+		14: ['blue', 'red'],
 	};
 
 	// game's size
@@ -24,7 +34,8 @@ $(function () {
 	var setValue = function (node, value) {
 		node.data('value', value);
 		node.text(value);
-		node.css('background-color', colorMap[value]);
+		node.css('background-color', colorMap[value][0]);
+		node.css('color', colorMap[value][1]);
 	};
 
 	// px of size of pile
@@ -79,10 +90,6 @@ $(function () {
 	};
 	var getByPos = function (i, j) {
 		var p = $('#D_'+i+'_'+j);
-		console.log(p);
-		console.log(p.length);
-		console.log(p[0]);
-		console.log(p.html());
 		return p;
 	}
 	var prepareFill = function  () {

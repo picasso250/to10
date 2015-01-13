@@ -30,16 +30,23 @@ $(function () {
 		}
 	};
 
+	// px of size of pile
+	var _pileSize = Math.floor(($(document).width() - 2 * 5) / pileCount);
+	var pileSize = _pileSize > 50 ? 50 : _pileSize;
+
+	var jumpSize = Math.floor(pileSize / 10); 
+
 	// set the number showed on the pile
 	var setValue = function (node, value) {
 		node.data('value', value);
 		node.text(value);
 		node.css('background-color', colorMap[value][0]);
 		node.css('color', colorMap[value][1]);
+		node.width(pileSize).height(pileSize);
+		node.css('font-size', Math.floor(pileSize * 0.6)+'px');
+		node.css('line-height', pileSize + 'px');
+		node.css('border-bottom-width', jumpSize + 'px');
 	};
-
-	// px of size of pile
-	var pileSize = 50;
 
 	// when pile fall, row No. change
 	var setPilePos = function (node, i, j) {
@@ -61,11 +68,11 @@ $(function () {
 			if (highLighting.length > 0) {
 				// if others are highlight-ing
 				$(highLighting).data('hightLight', 0);
-				changePos(highLighting, 'top', 5);
+				changePos(highLighting, 'top', jumpSize);
 			}
 			highLighting = [];
 			hightLight($this);
-			changePos(highLighting, 'top', -5);
+			changePos(highLighting, 'top', -jumpSize);
 		} else {
 			if (highLighting.length > 1) {
 				collapse($this);
@@ -179,7 +186,7 @@ $(function () {
 		if (value + 1 > gMaxValue) {
 			gMaxValue = value + 1;
 		};
-		var endPos = {top: (x*50), left: (y*50)};
+		var endPos = {top: (x * pileSize), left: (y * pileSize)};
 		animate(300, function (leftFrameCount) {
 			highLighting.map(function(e) {
 				['top', 'left'].map(function(attr) {
